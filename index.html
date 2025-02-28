@@ -7,8 +7,8 @@
     <style>
         #svg-container {
             width: 100%;
-            min-height: 300px; /* 最小の高さを設定 */
-            border: 1px solid #ccc; /* 境界線を追加 */
+            min-height: 300px;
+            border: 1px solid #ccc;
         }
         #svg-container svg {
             width: 100%;
@@ -33,6 +33,10 @@
     <div id="error-message"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/potrace@2.1.8/lib/index.min.js"></script>
+    <script>
+        // Potraceをグローバルオブジェクトとして公開
+        window.Potrace = require('potrace').Potrace;
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
