@@ -45,43 +45,45 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('ImageData取得:', imageData.width, 'x', imageData.height);
 
         try {
-            const potrace = new window.Potrace();
-            potrace.setParameters({
+            const potrace = window.Potrace;
+            const params = {
                 threshold: 128,
                 turdSize: 2,
                 alphaMax: 1,
                 optCurve: true,
                 optTolerance: 0.2,
-                turnPolicy: Potrace.TURNPOLICY_MINORITY
-            });
+                turnPolicy: potrace.TURNPOLICY_MINORITY
+            };
 
             console.log('Potraceパラメータ設定完了');
-            potrace.loadImageData(imageData);
-            console.log('ImageData読み込み完了');
+            potrace.trace(imageData, params, function(err, svg) {
+                if (err) {
+                    showError('SVG生成中にエラーが発生しました: ' + err.message);
+                    return;
+                }
+                console.log('SVG生成完了:', svg.length, '文字');
 
-            const svg = potrace.getSVG();
-            console.log('SVG生成完了:', svg.length, '文字');
+                svgContainer.innerHTML = svg;
+                console.log('SVGをDOMに挿入完了');
 
-            svgContainer.innerHTML = svg;
-            console.log('SVGをDOMに挿入完了');
+                colorControls.innerHTML = '';
+                const paths = svgContainer.querySelectorAll('path');
+                console.log('パス数:', paths.length);
 
-            colorControls.innerHTML = '';
-            const paths = svgContainer.querySelectorAll('path');
-            console.log('パス数:', paths.length);
-
-            paths.forEach((path, index) => {
-                path.id = `path-${index}`;
-                const colorInput = document.createElement('input');
-                colorInput.type = 'color';
-                colorInput.id = `color-${index}`;
-                colorInput.addEventListener('input', () => {
-                    path.style.fill = colorInput.value;
+                paths.forEach((path, index) => {
+                    path.id = `path-${index}`;
+                    const colorInput = document.createElement('input');
+                    colorInput.type = 'color';
+                    colorInput.id = `color-${index}`;
+                    colorInput.addEventListener('input', () => {
+                        path.style.fill = colorInput.value;
+                    });
+                    colorControls.appendChild(colorInput);
                 });
-                colorControls.appendChild(colorInput);
-            });
 
-            errorMessage.textContent = '';
-            console.log('処理完了');
+                errorMessage.textContent = '';
+                console.log('処理完了');
+            });
         } catch (error) {
             console.error('エラー発生:', error);
             showError('画像の処理中にエラーが発生しました: ' + error.message);
